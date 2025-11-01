@@ -1,0 +1,131 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Exply.dev GitHub Proxy MCP API",
+    "description": "HTTP API for managing project proposals in exply-dev-public-projects repository",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://exply-github-proxy-kwftltj4yq-uc.a.run.app",
+      "description": "Exply GitHub Proxy MCP Server on Google Cloud Run"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "Service status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "service": { "type": "string" },
+                    "version": { "type": "string" },
+                    "status": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tools/list": {
+      "get": {
+        "summary": "List available tools",
+        "operationId": "listTools",
+        "responses": {
+          "200": {
+            "description": "List of available tools",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tools": {
+                      "type": "array",
+                      "items": { "type": "object" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tools/call": {
+      "post": {
+        "summary": "Call an MCP tool",
+        "operationId": "callTool",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "arguments"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Tool name (e.g., 'create_project_issue')",
+                    "enum": [
+                      "create_project_issue",
+                      "update_project_issue",
+                      "get_project_issue",
+                      "list_project_issues"
+                    ]
+                  },
+                  "arguments": {
+                    "type": "object",
+                    "description": "Tool-specific arguments"
+                  }
+                }
+              },
+              "examples": {
+                "createIssue": {
+                  "summary": "Create a project proposal",
+                  "value": {
+                    "name": "create_project_issue",
+                    "arguments": {
+                      "title": "Project Proposal: Real Estate Auction App",
+                      "body": "### New Project Proposal\n\n#### Concept\nA real estate auction app...",
+                      "labels": ["project-proposal"]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tool executed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "issue": { "type": "object" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  }
+}
+
