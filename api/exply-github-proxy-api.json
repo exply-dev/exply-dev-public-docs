@@ -1,14 +1,14 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Exply.dev GitHub Proxy MCP API",
-    "description": "HTTP API for managing project proposals in exply-dev-public-projects repository",
+    "title": "Exply.dev Project Proposals API",
+    "description": "HTTP API for managing project proposals in the exply-dev-public-projects repository",
     "version": "1.0.0"
   },
   "servers": [
     {
       "url": "https://exply-github-proxy-kwftltj4yq-uc.a.run.app",
-      "description": "Exply GitHub Proxy MCP Server on Google Cloud Run"
+      "description": "Exply.dev Project Proposals API on Google Cloud Run"
     }
   ],
   "paths": {
@@ -61,7 +61,7 @@
     },
     "/tools/call": {
       "post": {
-        "summary": "Call an MCP tool",
+        "summary": "Execute a project management tool",
         "operationId": "callTool",
         "requestBody": {
           "required": true,
