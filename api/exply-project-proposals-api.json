@@ -1,0 +1,263 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Exply.dev Project Proposals API",
+    "description": "HTTP API for managing project proposals in the exply-dev-public-projects repository",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://exply-github-proxy-kwftltj4yq-uc.a.run.app",
+      "description": "Exply.dev Project Proposals API on Google Cloud Run"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Health check",
+        "operationId": "healthCheck",
+        "responses": {
+          "200": {
+            "description": "Service status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "service": { "type": "string" },
+                    "version": { "type": "string" },
+                    "status": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/create_project_issue": {
+      "post": {
+        "summary": "Create a new project proposal issue",
+        "operationId": "create_project_issue",
+        "description": "Create a new project proposal issue in the exply-dev-public-projects repository",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["title", "body"],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "The title of the project proposal (e.g., 'Project Proposal: [Concept]')",
+                    "example": "Project Proposal: Real Estate Auction App"
+                  },
+                  "body": {
+                    "type": "string",
+                    "description": "The detailed content of the project proposal in Markdown format",
+                    "example": "### New Project Proposal\n\n#### Concept\nA real estate auction app...\n\n#### Core MVP Features\n- Feature 1\n- Feature 2"
+                  },
+                  "labels": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Optional labels to add to the issue",
+                    "default": ["project-proposal"],
+                    "example": ["project-proposal"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Issue created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "issue": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "integer", "example": 123456789 },
+                        "number": { "type": "integer", "example": 1 },
+                        "title": { "type": "string", "example": "Project Proposal: Real Estate Auction App" },
+                        "html_url": { "type": "string", "format": "uri", "example": "https://github.com/exply-dev/exply-dev-public-projects/issues/1" },
+                        "state": { "type": "string", "example": "open" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - missing required fields"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/update_project_issue": {
+      "post": {
+        "summary": "Update an existing project proposal issue",
+        "operationId": "update_project_issue",
+        "description": "Update an existing project proposal issue (title, body, or state)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["issueNumber"],
+                "properties": {
+                  "issueNumber": {
+                    "type": "integer",
+                    "description": "The issue number to update",
+                    "example": 1
+                  },
+                  "title": {
+                    "type": "string",
+                    "description": "Updated title (optional)",
+                    "example": "Updated Project Proposal Title"
+                  },
+                  "body": {
+                    "type": "string",
+                    "description": "Updated body content in Markdown format (optional)",
+                    "example": "### Updated Content\n\nNew description..."
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": ["open", "closed"],
+                    "description": "Set issue state (optional)",
+                    "example": "open"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Issue updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "issue": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/get_project_issue": {
+      "post": {
+        "summary": "Get details of a project proposal issue",
+        "operationId": "get_project_issue",
+        "description": "Retrieve details of a specific project proposal issue",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["issueNumber"],
+                "properties": {
+                  "issueNumber": {
+                    "type": "integer",
+                    "description": "The issue number to retrieve",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Issue details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "issue": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/list_project_issues": {
+      "post": {
+        "summary": "List all project proposal issues",
+        "operationId": "list_project_issues",
+        "description": "List all project proposal issues (with filters for state, label, and limit)",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "state": {
+                    "type": "string",
+                    "enum": ["open", "closed", "all"],
+                    "description": "Filter issues by state",
+                    "default": "open",
+                    "example": "open"
+                  },
+                  "label": {
+                    "type": "string",
+                    "description": "Filter issues by label",
+                    "example": "project-proposal"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "description": "Maximum number of issues to return",
+                    "default": 30,
+                    "example": 30
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of issues retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "count": { "type": "integer" },
+                    "issues": {
+                      "type": "array",
+                      "items": { "type": "object" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
