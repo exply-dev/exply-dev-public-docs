@@ -15,6 +15,7 @@
     "/": {
       "get": {
         "summary": "Health check",
+        "operationId": "healthCheck",
         "responses": {
           "200": {
             "description": "Service status",
