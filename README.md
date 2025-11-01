@@ -44,3 +44,11 @@ See [`docs/`](docs/) directory for detailed guides and documentation.
 ## 📝 License
 
 Public documentation - use freely for integration purposes.
+
+## 🔒 Privacy Policy
+
+Our Privacy Policy explains how we handle information when you use exply.dev services:
+- [Privacy Policy](PRIVACY.md)
+- [Raw URL](https://raw.githubusercontent.com/exply-dev/exply-dev-public-docs/main/PRIVACY.md)
+
+Use this URL when configuring GPT Actions that require a privacy policy link.
