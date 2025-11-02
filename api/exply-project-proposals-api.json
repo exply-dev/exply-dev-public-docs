@@ -13,11 +13,20 @@
   ],
   "components": {
     "securitySchemes": {
-      "apiKey": {
-        "type": "apiKey",
-        "name": "Authorization",
-        "in": "header",
-        "description": "GitHub Personal Access Token (PAT). Format: 'Bearer ghp_...' or just 'ghp_...'. Optional but required for updating resources. For public GPT, authentication is not required - use githubUsername parameter instead."
+      "oauth2": {
+        "type": "oauth2",
+        "description": "GitHub OAuth 2.0 authentication. Tokens are automatically saved per-user-per-GPT and reused across all chats. Users only need to authorize once.",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://github.com/login/oauth/authorize",
+            "tokenUrl": "https://github.com/login/oauth/access_token",
+            "refreshUrl": "https://github.com/login/oauth/access_token",
+            "scopes": {
+              "public_repo": "Access to public repositories (required for creating/updating issues)",
+              "read:user": "Read user profile information (for ownership verification)"
+            }
+          }
+        }
       }
     },
     "schemas": {
@@ -71,8 +80,8 @@
         "operationId": "create_project_issue",
         "description": "Create a new project proposal issue in the exply-dev-public-projects repository. If authenticated, stores creator metadata for future ownership checks.",
         "security": [
-          {},
-          { "apiKey": [] }
+          { "oauth2": ["public_repo", "read:user"] },
+          {}
         ],
         "requestBody": {
           "required": true,
@@ -148,7 +157,7 @@
         "operationId": "update_project_issue",
         "description": "Update an existing project proposal issue (title, body, or state). **Requires authentication.** Only the creator of the issue can update it. Authentication via GitHub token (Authorization header) or githubUsername in body.",
         "security": [
-          { "apiKey": [] },
+          { "oauth2": ["public_repo", "read:user"] },
           {}
         ],
         "requestBody": {
@@ -398,8 +407,8 @@
         "operationId": "create_expert_profile",
         "description": "Create a new expert profile markdown file or update existing one in exply-dev-public-experts repository. If updating, **requires authentication** - only the creator can update their profile. Authentication via GitHub token (Authorization header) or githubUsername in body.",
         "security": [
-          {},
-          { "apiKey": [] }
+          { "oauth2": ["public_repo", "read:user"] },
+          {}
         ],
         "requestBody": {
           "required": true,

@@ -11,7 +11,31 @@
 
 ### Варианты настройки
 
-#### Вариант 1: Без авторизации (для публичного GPT - рекомендуемый)
+#### Вариант 1: OAuth 2.0 (рекомендуемый - персистентная авторизация)
+
+**⚠️ Новое: Рекомендуется использовать OAuth 2.0** для того, чтобы пользователи не должны были пере-авторизовываться в каждом новом чате. Токены сохраняются как "Connected accounts" и автоматически переиспользуются.
+
+**Настройка в GPT Actions:**
+1. Сначала создайте GitHub OAuth App: https://github.com/settings/developers
+   - Callback URL: `https://chatgpt.com/a/oauth/callback`
+   - Сохраните Client ID и Client Secret
+2. Загрузите OpenAPI схему: `https://raw.githubusercontent.com/exply-dev/exply-dev-public-docs/main/api/exply-project-proposals-api.json`
+3. В разделе "Аутентификация" выберите: **"OAuth"**
+   - Authorization URL: `https://github.com/login/oauth/authorize`
+   - Token URL: `https://github.com/login/oauth/access_token`
+   - Client ID: [из шага 1]
+   - Client Secret: [из шага 1]
+4. Сохраните
+
+**Полная инструкция:** См. [OAuth Setup Guide](oauth-setup.md)
+
+**Как работает:**
+- ✅ Пользователь авторизуется **один раз**
+- ✅ Токен сохраняется как "Connected account" **пер-пользователь-пер-GPT**
+- ✅ Автоматически используется во **всех чатах** с этим GPT
+- ✅ Автоматически обновляется при истечении (refresh tokens)
+
+#### Вариант 1b: Без авторизации (простой, но требует авторизацию каждый раз)
 
 **Настройка в GPT Actions:**
 1. Загрузите OpenAPI схему: `https://raw.githubusercontent.com/exply-dev/exply-dev-public-docs/main/api/exply-project-proposals-api.json`
