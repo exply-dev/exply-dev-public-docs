@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exply.dev - AI-Powered Development with Expert Review</title>
+    <meta name="description" content="Exply.dev использует AI для генерации кода и экспертов для ревью - быстрая разработка с гарантией качества">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --bg: #ffffff;
+            --bg-alt: #f8fafc;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 1rem;
+        }
+
+        .section {
+            margin-bottom: 4rem;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .card ul {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .card li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .card li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .cta {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+            transition: background 0.2s;
+        }
+
+        .cta:hover {
+            background: var(--primary-dark);
+        }
+
+        .code-block {
+            background: var(--bg-alt);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .code-block code {
+            color: var(--primary);
+        }
+
+        footer {
+            background: var(--bg-alt);
+            padding: 2rem 0;
+            text-align: center;
+            color: var(--text-light);
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .links {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🚀 Exply.dev</h1>
+        <p>AI генерирует код, эксперты ревьювят — быстрая разработка с гарантией качества</p>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>О платформе</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8; color: var(--text-light);">
+                Exply.dev — это гибридная модель разработки, которая сочетает скорость AI-генерации 
+                с качеством экспертного ревью. Каждый шаг разработки проходит через проверку опытными 
+                специалистами, что гарантирует надежность и соответствие стандартам.
+            </p>
+        </section>
+
+        <section class="section">
+            <h2>Преимущества модели Exply</h2>
+            <div class="cards">
+                <div class="card">
+                    <h3>⚡ Быстро</h3>
+                    <p>AI генерирует код мгновенно, эксперты фокусируются на ревью</p>
+                </div>
+                <div class="card">
+                    <h3>✅ Качественно</h3>
+                    <p>Каждый шаг проверяется опытными разработчиками</p>
+                </div>
+                <div class="card">
+                    <h3>💰 Эффективно</h3>
+                    <p>Оптимальное соотношение скорости и стоимости разработки</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>API и Документация</h2>
+            <p>Для разработчиков и интеграций:</p>
+            
+            <div class="code-block">
+                <strong>OpenAPI Specification:</strong><br>
+                <code>https://raw.githubusercontent.com/exply-dev/exply-dev-public-docs/main/api/exply-project-proposals-api.json</code>
+            </div>
+
+            <div class="cards" style="margin-top: 2rem;">
+                <div class="card">
+                    <h3>📚 Документация</h3>
+                    <ul>
+                        <li><a href="docs/gpt-actions-setup.md">Настройка GPT Actions</a></li>
+                        <li><a href="docs/oauth-setup.md">OAuth 2.0 Setup</a></li>
+                        <li><a href="docs/authentication.md">Аутентификация</a></li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>🔌 API Endpoints</h3>
+                    <ul>
+                        <li>Project Proposals</li>
+                        <li>Expert Profiles</li>
+                        <li>Label Management</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>🔗 Репозитории</h3>
+                    <ul>
+                        <li><a href="https://github.com/exply-dev/exply-dev-public-projects" target="_blank">Project Proposals</a></li>
+                        <li><a href="https://github.com/exply-dev/exply-dev-public-experts" target="_blank">Expert Profiles</a></li>
+                        <li><a href="https://github.com/exply-dev/exply-dev-public-docs" target="_blank">Documentation</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Начать работу</h2>
+            <p>Хотите создать проект или присоединиться как эксперт?</p>
+            <a href="https://github.com/exply-dev/exply-dev-public-projects" class="cta" target="_blank">
+                Создать проект →
+            </a>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Exply.dev. Все права защищены.</p>
+        <div class="links">
+            <a href="PRIVACY.md">Политика конфиденциальности</a>
+            <a href="https://github.com/exply-dev/exply-dev-public-docs">GitHub</a>
+            <a href="api/exply-project-proposals-api.json">API Spec</a>
+        </div>
+    </footer>
+</body>
+</html>
+
