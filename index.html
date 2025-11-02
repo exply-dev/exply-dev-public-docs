@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exply.dev - AI-Powered Development with Expert Review</title>
-    <meta name="description" content="Exply.dev использует AI для генерации кода и экспертов для ревью - быстрая разработка с гарантией качества">
+    <meta name="description" content="Exply.dev uses AI to generate code and experts to review it - fast development with guaranteed quality">
     <style>
         * {
             margin: 0;
@@ -15,12 +15,17 @@
         :root {
             --primary: #6366f1;
             --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
             --secondary: #8b5cf6;
-            --text: #1e293b;
+            --accent: #ec4899;
+            --text: #0f172a;
             --text-light: #64748b;
+            --text-lighter: #94a3b8;
             --bg: #ffffff;
             --bg-alt: #f8fafc;
-            --border: #e2e8f0;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         body {
@@ -28,249 +33,611 @@
             line-height: 1.6;
             color: var(--text);
             background: var(--bg);
+            overflow-x: hidden;
         }
 
-        header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 2rem 0;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 6rem 0 8rem;
+            position: relative;
+            overflow: hidden;
         }
 
-        header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            pointer-events: none;
         }
 
-        header p {
-            font-size: 1.2rem;
-            opacity: 0.95;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-
-        .container {
+        .hero-content {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 3rem 1rem;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 1;
+            text-align: center;
         }
 
-        .section {
-            margin-bottom: 4rem;
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            font-weight: 600;
         }
 
-        .section h2 {
-            font-size: 2rem;
+        .logo svg {
+            width: 48px;
+            height: 48px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 700;
             margin-bottom: 1.5rem;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: clamp(1.1rem, 2vw, 1.5rem);
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: white;
             color: var(--primary);
         }
 
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: var(--primary);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+        }
+
+        /* Section Headers */
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Cards Grid */
         .cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
-            margin-top: 2rem;
+            margin-top: 3rem;
         }
 
         .card {
             background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 2rem;
-            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 2.5rem;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 16px 16px 0 0;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
         }
 
         .card h3 {
             font-size: 1.5rem;
             margin-bottom: 1rem;
-            color: var(--primary);
+            color: var(--text);
+            font-weight: 600;
         }
 
-        .card ul {
-            list-style: none;
-            margin-top: 1rem;
+        .card p {
+            color: var(--text-light);
+            line-height: 1.7;
         }
 
-        .card li {
-            padding: 0.5rem 0;
-            padding-left: 1.5rem;
-            position: relative;
-        }
-
-        .card li:before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: var(--primary);
-            font-weight: bold;
-        }
-
-        .cta {
-            background: var(--primary);
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 1rem;
-            transition: background 0.2s;
-        }
-
-        .cta:hover {
-            background: var(--primary-dark);
-        }
-
-        .code-block {
+        /* Stats Section */
+        .stats {
             background: var(--bg-alt);
-            border: 1px solid var(--border);
-            border-radius: 8px;
+            padding: 4rem 0;
+            margin: 4rem 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            text-align: center;
+        }
+
+        .stat {
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        /* Features Section */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature {
             padding: 1.5rem;
-            margin: 1rem 0;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+
+        .feature p {
+            color: var(--text-light);
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
             overflow-x: auto;
             font-family: 'Monaco', 'Courier New', monospace;
             font-size: 0.9rem;
+            line-height: 1.6;
         }
 
         .code-block code {
-            color: var(--primary);
+            color: #60a5fa;
         }
 
+        /* Footer */
         footer {
-            background: var(--bg-alt);
-            padding: 2rem 0;
+            background: var(--text);
+            color: white;
+            padding: 3rem 0;
+            margin-top: 6rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
             text-align: center;
-            color: var(--text-light);
-            border-top: 1px solid var(--border);
-            margin-top: 4rem;
         }
 
-        footer a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        .links {
+        .footer-links {
             display: flex;
             gap: 2rem;
             justify-content: center;
             flex-wrap: wrap;
-            margin-top: 1rem;
+            margin: 2rem 0;
         }
 
+        .footer-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* Navigation */
+        nav {
+            position: absolute;
+            top: 2rem;
+            left: 0;
+            right: 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        nav .logo-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+        }
+
+        nav .logo-nav svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        nav .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        nav .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        nav .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 2rem;
+            .hero {
+                padding: 4rem 0 6rem;
             }
-            
-            .cards {
+
+            .container {
+                padding: 3rem 1rem;
+            }
+
+            .cards, .features-grid {
                 grid-template-columns: 1fr;
             }
+
+            nav .nav-links {
+                display: none;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card, .feature {
+            animation: fadeInUp 0.6s ease-out;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>🚀 Exply.dev</h1>
-        <p>AI генерирует код, эксперты ревьювят — быстрая разработка с гарантией качества</p>
-    </header>
+    <!-- Navigation -->
+    <nav>
+        <a href="#" class="logo-nav">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Star -->
+                <path d="M24 8L26.5 18.5L37 21L26.5 23.5L24 34L21.5 23.5L11 21L21.5 18.5L24 8Z" fill="white"/>
+                <!-- Outer arc -->
+                <path d="M12 28C12 28 18 32 24 32C30 32 36 28 36 28" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <!-- Inner arc -->
+                <path d="M14 32C14 32 18 35 24 35C30 35 34 32 34 32" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+            </svg>
+            exply.dev
+        </a>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#api">API</a>
+            <a href="docs/gpt-actions-setup.md">Docs</a>
+            <a href="https://github.com/exply-dev/exply-dev-public-projects" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Get Started</a>
+        </div>
+    </nav>
 
-    <div class="container">
-        <section class="section">
-            <h2>О платформе</h2>
-            <p style="font-size: 1.1rem; line-height: 1.8; color: var(--text-light);">
-                Exply.dev — это гибридная модель разработки, которая сочетает скорость AI-генерации 
-                с качеством экспертного ревью. Каждый шаг разработки проходит через проверку опытными 
-                специалистами, что гарантирует надежность и соответствие стандартам.
-            </p>
-        </section>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="logo">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M24 8L26.5 18.5L37 21L26.5 23.5L24 34L21.5 23.5L11 21L21.5 18.5L24 8Z" fill="white"/>
+                    <path d="M12 28C12 28 18 32 24 32C30 32 36 28 36 28" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+                    <path d="M14 32C14 32 18 35 24 35C30 35 34 32 34 32" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+                </svg>
+                exply.dev
+            </div>
+            <h1>The fastest way to build with AI-powered development</h1>
+            <p>AI generates code, experts review it — combine the speed of AI with the reliability of human expertise. Build faster, ship with confidence.</p>
+            <div class="cta-buttons">
+                <a href="https://github.com/exply-dev/exply-dev-public-projects" class="btn btn-primary" target="_blank">Start a Project</a>
+                <a href="docs/gpt-actions-setup.md" class="btn btn-secondary">View Docs</a>
+            </div>
+        </div>
+    </section>
 
-        <section class="section">
-            <h2>Преимущества модели Exply</h2>
-            <div class="cards">
-                <div class="card">
-                    <h3>⚡ Быстро</h3>
-                    <p>AI генерирует код мгновенно, эксперты фокусируются на ревью</p>
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat">
+                    <div class="stat-number">3-4</div>
+                    <div class="stat-label">Weeks to MVP</div>
                 </div>
-                <div class="card">
-                    <h3>✅ Качественно</h3>
-                    <p>Каждый шаг проверяется опытными разработчиками</p>
+                <div class="stat">
+                    <div class="stat-number">~$5K</div>
+                    <div class="stat-label">Typical MVP Cost</div>
                 </div>
-                <div class="card">
-                    <h3>💰 Эффективно</h3>
-                    <p>Оптимальное соотношение скорости и стоимости разработки</p>
+                <div class="stat">
+                    <div class="stat-number">1-2</div>
+                    <div class="stat-label">Expert Reviewers</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">24h</div>
+                    <div class="stat-label">Team Assembly</div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="section">
-            <h2>API и Документация</h2>
-            <p>Для разработчиков и интеграций:</p>
-            
-            <div class="code-block">
-                <strong>OpenAPI Specification:</strong><br>
-                <code>https://raw.githubusercontent.com/exply-dev/exply-dev-public-docs/main/api/exply-project-proposals-api.json</code>
+    <!-- Features Section -->
+    <section class="container" id="features">
+        <div class="section-header">
+            <h2>Why Choose Exply?</h2>
+            <p>Our hybrid model combines AI speed with expert quality assurance</p>
+        </div>
+        <div class="cards">
+            <div class="card">
+                <div class="card-icon">⚡</div>
+                <h3>Lightning Fast</h3>
+                <p>AI generates code instantly. Experts focus on what matters — review and refinement. Launch MVPs in weeks, not months.</p>
             </div>
-
-            <div class="cards" style="margin-top: 2rem;">
-                <div class="card">
-                    <h3>📚 Документация</h3>
-                    <ul>
-                        <li><a href="docs/gpt-actions-setup.md">Настройка GPT Actions</a></li>
-                        <li><a href="docs/oauth-setup.md">OAuth 2.0 Setup</a></li>
-                        <li><a href="docs/authentication.md">Аутентификация</a></li>
-                    </ul>
-                </div>
-                <div class="card">
-                    <h3>🔌 API Endpoints</h3>
-                    <ul>
-                        <li>Project Proposals</li>
-                        <li>Expert Profiles</li>
-                        <li>Label Management</li>
-                    </ul>
-                </div>
-                <div class="card">
-                    <h3>🔗 Репозитории</h3>
-                    <ul>
-                        <li><a href="https://github.com/exply-dev/exply-dev-public-projects" target="_blank">Project Proposals</a></li>
-                        <li><a href="https://github.com/exply-dev/exply-dev-public-experts" target="_blank">Expert Profiles</a></li>
-                        <li><a href="https://github.com/exply-dev/exply-dev-public-docs" target="_blank">Documentation</a></li>
-                    </ul>
-                </div>
+            <div class="card">
+                <div class="card-icon">✅</div>
+                <h3>Expert Verified</h3>
+                <p>Every step passes through experienced developers. Quality isn't optional — it's guaranteed by senior full-stack experts.</p>
             </div>
-        </section>
+            <div class="card">
+                <div class="card-icon">💰</div>
+                <h3>Cost Effective</h3>
+                <p>Optimal balance of speed and cost. Spend ~$500 on AI tokens, ~$4,500 on expert review. Far cheaper than traditional development.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🎯</div>
+                <h3>MVP Focused</h3>
+                <p>We help you scope the right MVP. Avoid over-engineering. Launch faster, validate sooner, iterate based on real feedback.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🤝</div>
+                <h3>Team Ready in 24h</h3>
+                <p>Post your project, get matched with the perfect team. Our AI agent pre-screens experts. Get your team proposal within 24 hours.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🔒</div>
+                <h3>Secure & Reliable</h3>
+                <p>OAuth 2.0 authentication, ownership verification, enterprise-grade security. Your projects are safe and accessible only to you.</p>
+            </div>
+        </div>
+    </section>
 
-        <section class="section">
-            <h2>Начать работу</h2>
-            <p>Хотите создать проект или присоединиться как эксперт?</p>
-            <a href="https://github.com/exply-dev/exply-dev-public-projects" class="cta" target="_blank">
-                Создать проект →
-            </a>
-        </section>
-    </div>
+    <!-- How It Works -->
+    <section class="container" style="background: var(--bg-alt); padding: 4rem 2rem; border-radius: 24px; margin: 4rem auto;">
+        <div class="section-header">
+            <h2>How It Works</h2>
+            <p>Simple, transparent, efficient</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature">
+                <div class="feature-icon">1️⃣</div>
+                <h3>Define Your MVP</h3>
+                <p>Chat with our AI agent. Discuss your idea. We help you scope the perfect MVP — focused, achievable, budget-friendly.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">2️⃣</div>
+                <h3>Get Honest Estimates</h3>
+                <p>We show you three models: Traditional (expensive), Pure AI (risky), and Exply (optimal). Transparent costs, no surprises.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">3️⃣</div>
+                <h3>Create Project Request</h3>
+                <p>One click creates a GitHub issue. Our system matches you with expert reviewers. Team proposal arrives within 24 hours.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">4️⃣</div>
+                <h3>Build & Ship</h3>
+                <p>AI generates code. Experts review every commit. Fast iterations, guaranteed quality. Launch your MVP in weeks.</p>
+            </div>
+        </div>
+    </section>
 
+    <!-- API Section -->
+    <section class="container" id="api">
+        <div class="section-header">
+            <h2>API & Documentation</h2>
+            <p>Everything developers need to integrate with Exply.dev</p>
+        </div>
+        
+        <div class="code-block">
+            <strong style="color: #94a3b8;">OpenAPI Specification:</strong><br>
+            <code style="color: #60a5fa;">https://raw.githubusercontent.com/exply-dev/exply-dev-public-docs/main/api/exply-project-proposals-api.json</code>
+        </div>
+
+        <div class="cards" style="margin-top: 2rem;">
+            <div class="card">
+                <div class="card-icon">📚</div>
+                <h3>Documentation</h3>
+                <ul style="list-style: none; margin-top: 1rem; color: var(--text-light);">
+                    <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative;">
+                        <span style="position: absolute; left: 0; color: var(--primary);">→</span>
+                        <a href="docs/gpt-actions-setup.md" style="color: var(--primary); text-decoration: none;">GPT Actions Setup</a>
+                    </li>
+                    <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative;">
+                        <span style="position: absolute; left: 0; color: var(--primary);">→</span>
+                        <a href="docs/oauth-setup.md" style="color: var(--primary); text-decoration: none;">OAuth 2.0 Setup</a>
+                    </li>
+                    <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative;">
+                        <span style="position: absolute; left: 0; color: var(--primary);">→</span>
+                        <a href="docs/authentication.md" style="color: var(--primary); text-decoration: none;">Authentication Guide</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-icon">🔌</div>
+                <h3>API Endpoints</h3>
+                <ul style="list-style: none; margin-top: 1rem; color: var(--text-light);">
+                    <li style="padding: 0.5rem 0;">✓ Project Proposals</li>
+                    <li style="padding: 0.5rem 0;">✓ Expert Profiles</li>
+                    <li style="padding: 0.5rem 0;">✓ Label Management</li>
+                    <li style="padding: 0.5rem 0;">✓ Ownership Verification</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-icon">🔗</div>
+                <h3>Repositories</h3>
+                <ul style="list-style: none; margin-top: 1rem; color: var(--text-light);">
+                    <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative;">
+                        <span style="position: absolute; left: 0; color: var(--primary);">→</span>
+                        <a href="https://github.com/exply-dev/exply-dev-public-projects" target="_blank" style="color: var(--primary); text-decoration: none;">Project Proposals</a>
+                    </li>
+                    <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative;">
+                        <span style="position: absolute; left: 0; color: var(--primary);">→</span>
+                        <a href="https://github.com/exply-dev/exply-dev-public-experts" target="_blank" style="color: var(--primary); text-decoration: none;">Expert Profiles</a>
+                    </li>
+                    <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative;">
+                        <span style="position: absolute; left: 0; color: var(--primary);">→</span>
+                        <a href="https://github.com/exply-dev/exply-dev-public-docs" target="_blank" style="color: var(--primary); text-decoration: none;">Documentation</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="container" style="text-align: center; padding: 4rem 2rem;">
+        <h2 style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--text);">Ready to Build Your MVP?</h2>
+        <p style="font-size: 1.2rem; color: var(--text-light); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+            Join founders who ship faster with AI-powered development and expert review
+        </p>
+        <a href="https://github.com/exply-dev/exply-dev-public-projects" class="btn btn-primary" target="_blank" style="font-size: 1.2rem; padding: 1.25rem 2.5rem;">
+            Create Your Project →
+        </a>
+    </section>
+
+    <!-- Footer -->
     <footer>
-        <p>&copy; 2024 Exply.dev. Все права защищены.</p>
-        <div class="links">
-            <a href="PRIVACY.md">Политика конфиденциальности</a>
-            <a href="https://github.com/exply-dev/exply-dev-public-docs">GitHub</a>
-            <a href="api/exply-project-proposals-api.json">API Spec</a>
+        <div class="footer-content">
+            <div class="logo" style="justify-content: center; color: white; margin-bottom: 1rem;">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M24 8L26.5 18.5L37 21L26.5 23.5L24 34L21.5 23.5L11 21L21.5 18.5L24 8Z" fill="white"/>
+                    <path d="M12 28C12 28 18 32 24 32C30 32 36 28 36 28" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+                    <path d="M14 32C14 32 18 35 24 35C30 35 34 32 34 32" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+                </svg>
+                exply.dev
+            </div>
+            <p style="color: #94a3b8; margin-bottom: 1rem;">AI-powered development with expert review</p>
+            <div class="footer-links">
+                <a href="PRIVACY.md">Privacy Policy</a>
+                <a href="https://github.com/exply-dev/exply-dev-public-docs">GitHub</a>
+                <a href="api/exply-project-proposals-api.json">API Specification</a>
+                <a href="docs/gpt-actions-setup.md">Documentation</a>
+            </div>
+            <p style="color: #64748b; margin-top: 2rem; font-size: 0.9rem;">© 2024 Exply.dev. All rights reserved.</p>
         </div>
     </footer>
 </body>
 </html>
-
