@@ -18,9 +18,9 @@
         "description": "GitHub OAuth 2.0 authentication. Tokens are automatically saved per-user-per-GPT and reused across all chats. Users only need to authorize once.",
         "flows": {
           "authorizationCode": {
-            "authorizationUrl": "https://github.com/login/oauth/authorize",
-            "tokenUrl": "https://github.com/login/oauth/access_token",
-            "refreshUrl": "https://github.com/login/oauth/access_token",
+            "authorizationUrl": "https://exply-github-proxy-kwftltj4yq-uc.a.run.app/oauth/authorize",
+            "tokenUrl": "https://exply-github-proxy-kwftltj4yq-uc.a.run.app/oauth/access_token",
+            "refreshUrl": "https://exply-github-proxy-kwftltj4yq-uc.a.run.app/oauth/access_token",
             "scopes": {
               "public_repo": "Access to public repositories (required for creating/updating issues)",
               "read:user": "Read user profile information (for ownership verification)"
@@ -78,7 +78,7 @@
       "post": {
         "summary": "Create a new project proposal issue",
         "operationId": "create_project_issue",
-        "description": "Create a new project proposal issue in the exply-dev-public-projects repository. If authenticated, stores creator metadata for future ownership checks.",
+        "description": "Create a new project proposal issue in the exply-dev-public-projects repository. Automatically creates a GitHub Project for this project issue and adds the issue to it. If authenticated, stores creator metadata for future ownership checks. Expert applications to this project will be automatically added to the GitHub Project.",
         "security": [
           { "oauth2": ["public_repo", "read:user"] },
           {}
@@ -120,7 +120,7 @@
         },
         "responses": {
           "200": {
-            "description": "Issue created successfully",
+            "description": "Issue created successfully. A GitHub Project is automatically created for this project issue, and the issue is added to it. Expert applications will be automatically added to this GitHub Project.",
             "content": {
               "application/json": {
                 "schema": {
@@ -134,7 +134,19 @@
                         "number": { "type": "integer", "example": 1 },
                         "title": { "type": "string", "example": "Project Proposal: Real Estate Auction App" },
                         "html_url": { "type": "string", "format": "uri", "example": "https://github.com/exply-dev/exply-dev-public-projects/issues/1" },
-                        "state": { "type": "string", "example": "open" }
+                        "state": { "type": "string", "example": "open" },
+                        "creator": { "type": "string", "example": "vlad-exply" }
+                      }
+                    },
+                    "project": {
+                      "type": "object",
+                      "description": "GitHub Project information (null if project creation failed)",
+                      "nullable": true,
+                      "properties": {
+                        "id": { "type": "string", "description": "GraphQL node ID of the project", "example": "PVT_kwDOQNbrIs7..." },
+                        "number": { "type": "integer", "description": "Project number", "example": 1 },
+                        "title": { "type": "string", "description": "Project title", "example": "Project #1: Real Estate Auction App" },
+                        "url": { "type": "string", "format": "uri", "description": "URL to the GitHub Project", "example": "https://github.com/orgs/exply-dev/projects/1" }
                       }
                     }
                   }
@@ -309,6 +321,226 @@
                     }
                   }
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/create_expert_application": {
+      "post": {
+        "summary": "Create an expert application issue for a project",
+        "operationId": "create_expert_application",
+        "description": "Create a new issue representing an expert's application to join a project. This is preferred over comments as it enables better tracking, filtering, and workflow management through GitHub Projects. The created issue will be automatically linked to the project issue and added to the corresponding GitHub Project (if it exists) for visual workflow management.",
+        "security": [
+          { "oauth2": ["public_repo", "read:user"] },
+          {}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["projectIssueNumber", "body"],
+                "properties": {
+                  "projectIssueNumber": {
+                    "type": "integer",
+                    "description": "Project issue number the expert is applying to",
+                    "example": 13
+                  },
+                  "body": {
+                    "type": "string",
+                    "description": "Application body (markdown) with expert profile information",
+                    "example": "👋 **Expert Candidate Application**\n\nI'm interested in joining this project as a Backend Specialist (Level: Senior)..."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Expert application issue created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "issue": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "integer" },
+                        "number": { "type": "integer" },
+                        "title": { "type": "string" },
+                        "html_url": { "type": "string" },
+                        "state": { "type": "string" },
+                        "creator": { "type": "string" }
+                      }
+                    },
+                    "note": { "type": "string", "description": "Optional note about fallback to bot token" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/add_issue_comment": {
+      "post": {
+        "summary": "Add a comment to an issue",
+        "operationId": "add_issue_comment",
+        "description": "Add a comment to an existing issue. Used for: 1) Project creator asking questions to experts (on expert application issues), 2) Expert responding to questions (on their own application issues), 3) General comments on project issues. **Permission checks:** For expert application issues, only the expert (application creator) or project creator can comment. For project issues, anyone can comment (public repository).",
+        "security": [
+          { "oauth2": ["public_repo", "read:user"] },
+          {}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["issueNumber", "body"],
+                "properties": {
+                  "issueNumber": {
+                    "type": "integer",
+                    "description": "Issue number to comment on",
+                    "example": 15
+                  },
+                  "body": {
+                    "type": "string",
+                    "description": "Comment body (markdown)",
+                    "example": "Could you clarify your experience with React?"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Comment created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "comment": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "integer" },
+                        "html_url": { "type": "string" },
+                        "body": { "type": "string" },
+                        "created_at": { "type": "string" },
+                        "user": { "type": "string" }
+                      }
+                    },
+                    "note": { "type": "string", "description": "Optional note about fallback to bot token" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - insufficient permissions to comment on this issue",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/my_projects": {
+      "post": {
+        "summary": "Get current user's projects",
+        "operationId": "my_projects",
+        "description": "Retrieve all project proposals created by the authenticated user. Requires OAuth authentication.",
+        "security": [
+          { "oauth2": ["public_repo", "read:user"] }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "state": {
+                    "type": "string",
+                    "enum": ["open", "closed", "all"],
+                    "description": "Filter projects by state",
+                    "default": "all",
+                    "example": "all"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "description": "Maximum number of projects to return",
+                    "default": 100,
+                    "example": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User's projects retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "username": { "type": "string", "example": "vlad-exply" },
+                    "count": { "type": "integer" },
+                    "projects": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "number": { "type": "integer" },
+                          "title": { "type": "string" },
+                          "state": { "type": "string" },
+                          "html_url": { "type": "string" },
+                          "labels": { "type": "array", "items": { "type": "string" } },
+                          "created_at": { "type": "string" },
+                          "updated_at": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
               }
             }
           }
@@ -536,7 +768,284 @@
           }
         }
       }
+    },
+    "/list_project_applications": {
+      "post": {
+        "summary": "List expert applications for a project",
+        "operationId": "list_project_applications",
+        "description": "List all expert applications for a specific project. Returns applications with their current field values (Status, Expert Type, Expert Level) from GitHub Projects. **Requires authentication** - only the project creator can view applications.",
+        "security": [
+          { "oauth2": ["public_repo", "read:user"] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["projectIssueNumber"],
+                "properties": {
+                  "projectIssueNumber": {
+                    "type": "integer",
+                    "description": "Project issue number",
+                    "example": 13
+                  },
+                  "state": {
+                    "type": "string",
+                    "enum": ["open", "closed", "all"],
+                    "description": "Filter applications by state",
+                    "default": "open",
+                    "example": "open"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Applications retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "projectIssueNumber": { "type": "integer" },
+                    "count": { "type": "integer" },
+                    "applications": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "number": { "type": "integer" },
+                          "title": { "type": "string" },
+                          "body": { "type": "string" },
+                          "state": { "type": "string" },
+                          "html_url": { "type": "string" },
+                          "created_at": { "type": "string" },
+                          "creator": { "type": "string" },
+                          "fields": {
+                            "type": "object",
+                            "properties": {
+                              "status": { "type": "string", "nullable": true, "description": "Current status (Pending Review, Under Review, Approved, Rejected, Assigned)" },
+                              "expertType": { "type": "string", "nullable": true, "description": "Expert type specialization" },
+                              "expertLevel": { "type": "string", "nullable": true, "description": "Expert level (Junior, Mid, Senior, Lead)" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - only project creator can view applications",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/update_application_status": {
+      "post": {
+        "summary": "Update application status",
+        "operationId": "update_application_status",
+        "description": "Update the Status field of an expert application in GitHub Projects. All changes are synced to GitHub Projects and visible in the GitHub UI. **Requires authentication** - only the project creator can update applications.",
+        "security": [
+          { "oauth2": ["public_repo", "read:user"] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["applicationIssueNumber", "status"],
+                "properties": {
+                  "applicationIssueNumber": {
+                    "type": "integer",
+                    "description": "Expert application issue number",
+                    "example": 15
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["Pending Review", "Under Review", "Approved", "Rejected", "Assigned"],
+                    "description": "New status value",
+                    "example": "Approved"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Status updated successfully and synced to GitHub Projects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "applicationIssueNumber": { "type": "integer" },
+                    "status": { "type": "string" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - only project creator can update applications",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/update_application_fields": {
+      "post": {
+        "summary": "Update application fields (Expert Type, Expert Level)",
+        "operationId": "update_application_fields",
+        "description": "Update Expert Type and/or Expert Level fields of an expert application in GitHub Projects. All changes are synced to GitHub Projects and visible in the GitHub UI. **Requires authentication** - only the project creator can update applications.",
+        "security": [
+          { "oauth2": ["public_repo", "read:user"] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["applicationIssueNumber"],
+                "properties": {
+                  "applicationIssueNumber": {
+                    "type": "integer",
+                    "description": "Expert application issue number",
+                    "example": 15
+                  },
+                  "expertType": {
+                    "type": "string",
+                    "description": "Expert type specialization (e.g., 'Backend Specialist', 'Frontend Specialist', 'Full-Stack Engineer')",
+                    "example": "Full-Stack Engineer"
+                  },
+                  "expertLevel": {
+                    "type": "string",
+                    "enum": ["Junior", "Mid", "Senior", "Lead"],
+                    "description": "Expert level",
+                    "example": "Senior"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Fields updated successfully and synced to GitHub Projects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "applicationIssueNumber": { "type": "integer" },
+                    "updated": { "type": "array", "items": { "type": "string" } },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - only project creator can update applications",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/list_my_applications": {
+      "post": {
+        "summary": "List my expert applications",
+        "operationId": "list_my_applications",
+        "description": "List all expert applications created by the authenticated user (expert). Returns applications with project references. **Requires authentication** - OAuth token required.",
+        "security": [
+          { "oauth2": ["public_repo", "read:user"] }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "state": {
+                    "type": "string",
+                    "enum": ["open", "closed", "all"],
+                    "description": "Filter applications by state",
+                    "default": "open",
+                    "example": "open"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Applications retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "username": { "type": "string", "example": "expert1" },
+                    "count": { "type": "integer" },
+                    "applications": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "number": { "type": "integer" },
+                          "title": { "type": "string" },
+                          "body": { "type": "string" },
+                          "state": { "type": "string" },
+                          "html_url": { "type": "string" },
+                          "created_at": { "type": "string" },
+                          "updated_at": { "type": "string" },
+                          "projectIssueNumber": { "type": "integer", "nullable": true, "description": "Project issue number this application is for" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication required",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
-
