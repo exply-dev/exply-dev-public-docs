@@ -27,12 +27,21 @@ HTTP API for managing project proposals in the `exply-dev/exply-dev-public-proje
 3. The GPT will automatically discover available operations
 
 **Available Operations:**
+
+**Project Management:**
 - `create_project_issue` - Create a new project proposal
 - `update_project_issue` - Update an existing project proposal (title, body, or state)
 - `get_project_issue` - Retrieve details of a specific project proposal issue
 - `list_project_issues` - List all project proposal issues (with filters for state, label, and limit)
+
+**Label Management:**
 - `get_labels` - Retrieve all repository labels
 - `create_label` - Create a new repository label (with duplicate checking)
+
+**Expert Profiles:**
+- `create_expert_profile` - Create or update an expert profile (MD file in exply-dev-public-experts)
+- `get_expert_profile` - Retrieve an expert profile
+- `list_experts` - List all expert profiles
 
 ## 📖 Documentation
 
