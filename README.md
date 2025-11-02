@@ -9,14 +9,18 @@ Public documentation and API specifications for exply.dev platform services.
 
 ## 🔌 Available APIs
 
-### Exply Project Proposals API
+### Exply.dev Platform API
 
-HTTP API for managing project proposals in the `exply-dev/exply-dev-public-projects` repository.
+Unified HTTP API for managing exply.dev platform resources:
+- **Project Proposals** in `exply-dev/exply-dev-public-projects`
+- **Expert Profiles** in `exply-dev/exply-dev-public-experts`
 
 **OpenAPI Specification (REST API):**
 - **File:** [`api/exply-project-proposals-api.json`](api/exply-project-proposals-api.json)
-- **Raw URL:** https://raw.githubusercontent.com/exply-dev/exply-dev-public-docs/main/api/exply-project-proposals-api.json
+- **Raw URL (для GPT Actions):** https://raw.githubusercontent.com/exply-dev/exply-dev-public-docs/main/api/exply-project-proposals-api.json
 - **Service URL:** https://exply-github-proxy-kwftltj4yq-uc.a.run.app
+
+**💡 Архитектура:** Один единый API для всех операций платформы (проекты + эксперты). Это упрощает поддержку и конфигурацию. Если понадобится разделение в будущем, можно будет создать отдельные сервисы.
 
 **Usage in ChatGPT/Custom GPTs:**
 1. Go to your GPT configuration → Actions
@@ -50,6 +54,7 @@ See [`docs/`](docs/) directory for detailed guides and documentation.
 ## 🔗 Related Repositories
 
 - **Project Proposals:** [exply-dev/exply-dev-public-projects](https://github.com/exply-dev/exply-dev-public-projects)
+- **Expert Profiles:** [exply-dev/exply-dev-public-experts](https://github.com/exply-dev/exply-dev-public-experts)
 - **Specifications:** [exply-dev/exply-dev-specs](https://github.com/exply-dev/exply-dev-specs)
 
 ## 📝 License
