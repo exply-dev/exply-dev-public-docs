@@ -92,6 +92,11 @@
                     "description": "Optional labels to add to the issue",
                     "default": ["project-proposal"],
                     "example": ["project-proposal"]
+                  },
+                  "githubUsername": {
+                    "type": "string",
+                    "description": "GitHub username for storing creator metadata. Optional but recommended for future ownership verification.",
+                    "example": "vlad-exply"
                   }
                 }
               }
