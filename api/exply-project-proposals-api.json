@@ -1,16 +1,40 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Exply.dev Project Proposals API",
-    "description": "HTTP API for managing project proposals in the exply-dev-public-projects repository",
+    "title": "Exply.dev Platform API",
+    "description": "Unified HTTP API for managing exply.dev platform resources: project proposals and expert profiles. Supports optional GitHub OAuth authentication for ownership verification.",
     "version": "1.0.0"
   },
   "servers": [
     {
       "url": "https://exply-github-proxy-kwftltj4yq-uc.a.run.app",
-      "description": "Exply.dev Project Proposals API on Google Cloud Run"
+      "description": "Exply.dev Platform API on Google Cloud Run"
     }
   ],
+  "components": {
+    "securitySchemes": {
+      "githubOAuth": {
+        "type": "oauth2",
+        "description": "GitHub OAuth2 authentication. Optional but required for updating resources. Only the creator can update their own resources.",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://github.com/login/oauth/authorize",
+            "tokenUrl": "https://github.com/login/oauth/access_token",
+            "scopes": {
+              "public_repo": "Access to public repositories",
+              "read:user": "Read user profile information"
+            }
+          }
+        }
+      },
+      "apiKey": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "description": "GitHub Personal Access Token (PAT). Format: 'Bearer ghp_...' or just 'ghp_...'. Optional but required for updating resources."
+      }
+    }
+  },
   "paths": {
     "/": {
       "get": {
@@ -39,7 +63,11 @@
       "post": {
         "summary": "Create a new project proposal issue",
         "operationId": "create_project_issue",
-        "description": "Create a new project proposal issue in the exply-dev-public-projects repository",
+        "description": "Create a new project proposal issue in the exply-dev-public-projects repository. If authenticated, stores creator metadata for future ownership checks.",
+        "security": [
+          {},
+          { "apiKey": [] }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -107,7 +135,10 @@
       "post": {
         "summary": "Update an existing project proposal issue",
         "operationId": "update_project_issue",
-        "description": "Update an existing project proposal issue (title, body, or state)",
+        "description": "Update an existing project proposal issue (title, body, or state). **Requires authentication.** Only the creator of the issue can update it.",
+        "security": [
+          { "apiKey": [] }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -348,7 +379,11 @@
       "post": {
         "summary": "Create or update an expert profile",
         "operationId": "create_expert_profile",
-        "description": "Create a new expert profile markdown file or update existing one in exply-dev-public-experts repository",
+        "description": "Create a new expert profile markdown file or update existing one in exply-dev-public-experts repository. If updating, **requires authentication** - only the creator can update their profile.",
+        "security": [
+          {},
+          { "apiKey": [] }
+        ],
         "requestBody": {
           "required": true,
           "content": {
