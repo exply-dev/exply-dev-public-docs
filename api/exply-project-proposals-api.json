@@ -19,6 +19,26 @@
         "in": "header",
         "description": "GitHub Personal Access Token (PAT). Format: 'Bearer ghp_...' or just 'ghp_...'. Optional but required for updating resources. For public GPT, authentication is not required - use githubUsername parameter instead."
       }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error message"
+          }
+        }
+      },
+      "Success": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      }
     }
   },
   "paths": {
