@@ -135,9 +135,10 @@
       "post": {
         "summary": "Update an existing project proposal issue",
         "operationId": "update_project_issue",
-        "description": "Update an existing project proposal issue (title, body, or state). **Requires authentication.** Only the creator of the issue can update it.",
+        "description": "Update an existing project proposal issue (title, body, or state). **Requires authentication.** Only the creator of the issue can update it. Authentication via GitHub token (Authorization header) or githubUsername in body.",
         "security": [
-          { "apiKey": [] }
+          { "apiKey": [] },
+          {}
         ],
         "requestBody": {
           "required": true,
@@ -151,6 +152,11 @@
                     "type": "integer",
                     "description": "The issue number to update",
                     "example": 1
+                  },
+                  "githubUsername": {
+                    "type": "string",
+                    "description": "GitHub username for ownership verification (alternative to token)",
+                    "example": "vlad-exply"
                   },
                   "title": {
                     "type": "string",
@@ -379,7 +385,7 @@
       "post": {
         "summary": "Create or update an expert profile",
         "operationId": "create_expert_profile",
-        "description": "Create a new expert profile markdown file or update existing one in exply-dev-public-experts repository. If updating, **requires authentication** - only the creator can update their profile.",
+        "description": "Create a new expert profile markdown file or update existing one in exply-dev-public-experts repository. If updating, **requires authentication** - only the creator can update their profile. Authentication via GitHub token (Authorization header) or githubUsername in body.",
         "security": [
           {},
           { "apiKey": [] }
@@ -396,6 +402,11 @@
                     "type": "string",
                     "description": "Filename in experts/ directory (e.g., 'john-doe.md' or 'experts/john-doe.md')",
                     "example": "john-doe.md"
+                  },
+                  "githubUsername": {
+                    "type": "string",
+                    "description": "GitHub username for ownership verification when updating (alternative to token)",
+                    "example": "john-doe"
                   },
                   "content": {
                     "type": "string",
