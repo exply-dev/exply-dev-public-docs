@@ -31,6 +31,8 @@ HTTP API for managing project proposals in the `exply-dev/exply-dev-public-proje
 - `update_project_issue` - Update an existing project proposal (title, body, or state)
 - `get_project_issue` - Retrieve details of a specific project proposal issue
 - `list_project_issues` - List all project proposal issues (with filters for state, label, and limit)
+- `get_labels` - Retrieve all repository labels
+- `create_label` - Create a new repository label (with duplicate checking)
 
 ## 📖 Documentation
 
