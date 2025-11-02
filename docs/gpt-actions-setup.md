@@ -15,6 +15,8 @@
 
 **Настройка в GPT Actions:**
 1. Загрузите OpenAPI схему: `https://raw.githubusercontent.com/exply-dev/exply-dev-public-docs/main/api/exply-project-proposals-api.json`
+   - **Примечание:** Если видите старую версию в браузере (с `schemas: {}`), это кэш GitHub CDN. Подождите 5-10 минут или используйте прямой URL через GitHub API:
+     `https://api.github.com/repos/exply-dev/exply-dev-public-docs/contents/api/exply-project-proposals-api.json` (нужно декодировать base64 из поля `content`)
 2. В разделе "Аутентификация" выберите: **"Ничего" (Nothing)**
 3. Сохраните
 
