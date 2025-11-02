@@ -257,6 +257,92 @@
           }
         }
       }
+    },
+    "/get_labels": {
+      "get": {
+        "summary": "Get all repository labels",
+        "operationId": "get_labels",
+        "description": "Retrieve all labels available in the exply-dev-public-projects repository",
+        "responses": {
+          "200": {
+            "description": "List of labels retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "labels": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": { "type": "string", "example": "project-proposal" },
+                          "color": { "type": "string", "example": "0E8A16" },
+                          "description": { "type": "string", "example": "New project proposal" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/create_label": {
+      "post": {
+        "summary": "Create a new repository label",
+        "operationId": "create_label",
+        "description": "Create a new label in the repository (avoids duplicates by checking existing labels first)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Label name (will check for duplicates case-insensitively)",
+                    "example": "real-estate"
+                  },
+                  "color": {
+                    "type": "string",
+                    "description": "Hex color code (without #)",
+                    "default": "0E8A16",
+                    "example": "0E8A16"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Label description",
+                    "example": "Real estate related projects"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Label created or already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "label": { "type": "object" },
+                    "message": { "type": "string", "description": "Present if label already exists" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
