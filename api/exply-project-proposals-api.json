@@ -78,7 +78,7 @@
       "post": {
         "summary": "Create a new project proposal issue",
         "operationId": "create_project_issue",
-        "description": "Create a new project proposal issue in the exply-dev-public-projects repository. Automatically creates a GitHub Project for this project issue and adds the issue to it. If authenticated, stores creator metadata for future ownership checks. Expert applications to this project will be automatically added to the GitHub Project.",
+        "description": "Create a new project proposal issue. Automatically creates a GitHub Project and adds the issue to it. Expert applications will be automatically added to the GitHub Project. Stores creator metadata for ownership verification.",
         "security": [
           { "oauth2": ["public_repo", "read:user"] },
           {}
@@ -331,7 +331,7 @@
       "post": {
         "summary": "Create an expert application issue for a project",
         "operationId": "create_expert_application",
-        "description": "Create a new issue representing an expert's application to join a project. This is preferred over comments as it enables better tracking, filtering, and workflow management through GitHub Projects. The created issue will be automatically linked to the project issue and added to the corresponding GitHub Project (if it exists) for visual workflow management.",
+        "description": "Create an expert application issue for a project. Preferred over comments for better tracking and workflow management. Automatically linked to the project issue and added to the GitHub Project.",
         "security": [
           { "oauth2": ["public_repo", "read:user"] },
           {}
@@ -400,7 +400,7 @@
       "post": {
         "summary": "Add a comment to an issue",
         "operationId": "add_issue_comment",
-        "description": "Add a comment to an existing issue. Used for: 1) Project creator asking questions to experts (on expert application issues), 2) Expert responding to questions (on their own application issues), 3) General comments on project issues. **Permission checks:** For expert application issues, only the expert (application creator) or project creator can comment. For project issues, anyone can comment (public repository).",
+        "description": "Add a comment to an issue. For expert applications: only the expert or project creator can comment. For project issues: anyone can comment (public repository). Used for questions and responses.",
         "security": [
           { "oauth2": ["public_repo", "read:user"] },
           {}
