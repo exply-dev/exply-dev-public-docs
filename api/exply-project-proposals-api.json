@@ -343,6 +343,133 @@
           }
         }
       }
+    },
+    "/create_expert_profile": {
+      "post": {
+        "summary": "Create or update an expert profile",
+        "operationId": "create_expert_profile",
+        "description": "Create a new expert profile markdown file or update existing one in exply-dev-public-experts repository",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["filename", "content"],
+                "properties": {
+                  "filename": {
+                    "type": "string",
+                    "description": "Filename in experts/ directory (e.g., 'john-doe.md' or 'experts/john-doe.md')",
+                    "example": "john-doe.md"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Markdown content of the expert profile",
+                    "example": "# John Doe - Full-Stack Engineer\n\n**Status:** Active..."
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "Commit message",
+                    "default": "Create expert profile: {filename}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Expert profile created or updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "file": { "type": "object" },
+                    "action": { "type": "string", "enum": ["created", "updated"] }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/get_expert_profile": {
+      "post": {
+        "summary": "Get an expert profile",
+        "operationId": "get_expert_profile",
+        "description": "Retrieve an expert profile markdown file from exply-dev-public-experts repository",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["filename"],
+                "properties": {
+                  "filename": {
+                    "type": "string",
+                    "description": "Filename in experts/ directory",
+                    "example": "john-doe.md"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Expert profile retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "file": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/list_experts": {
+      "get": {
+        "summary": "List all expert profiles",
+        "operationId": "list_experts",
+        "description": "List all expert profile markdown files in exply-dev-public-experts repository",
+        "responses": {
+          "200": {
+            "description": "List of experts retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "count": { "type": "integer" },
+                    "experts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": { "type": "string" },
+                          "path": { "type": "string" },
+                          "html_url": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
