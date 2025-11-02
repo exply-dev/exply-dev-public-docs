@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Exply.dev Platform API",
-    "description": "Unified HTTP API for managing exply.dev platform resources: project proposals and expert profiles. Supports optional GitHub OAuth authentication for ownership verification.",
+    "description": "Unified HTTP API for managing exply.dev platform resources: project proposals and expert profiles. Supports optional GitHub token authentication or username-based ownership verification.",
     "version": "1.0.0"
   },
   "servers": [
