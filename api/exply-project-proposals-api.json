@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://exply-github-proxy-kwftltj4yq-uc.a.run.app",
+      "url": "https://exply-github-proxy-607178802953.us-central1.run.app",
       "description": "Exply.dev Platform API on Google Cloud Run"
     }
   ],
@@ -18,12 +18,13 @@
         "description": "GitHub OAuth 2.0 authentication. Tokens are automatically saved per-user-per-GPT and reused across all chats. Users only need to authorize once.",
         "flows": {
           "authorizationCode": {
-            "authorizationUrl": "https://exply-github-proxy-kwftltj4yq-uc.a.run.app/oauth/authorize",
-            "tokenUrl": "https://exply-github-proxy-kwftltj4yq-uc.a.run.app/oauth/access_token",
-            "refreshUrl": "https://exply-github-proxy-kwftltj4yq-uc.a.run.app/oauth/access_token",
+            "authorizationUrl": "https://exply-github-proxy-607178802953.us-central1.run.app/oauth/authorize",
+            "tokenUrl": "https://exply-github-proxy-607178802953.us-central1.run.app/oauth/access_token",
+            "refreshUrl": "https://exply-github-proxy-607178802953.us-central1.run.app/oauth/access_token",
             "scopes": {
               "public_repo": "Access to public repositories (required for creating/updating issues)",
-              "read:user": "Read user profile information (for ownership verification)"
+              "read:user": "Read user profile information (for ownership verification)",
+              "read:org": "Read organization membership (required for managing GitHub Projects)"
             }
           }
         }
