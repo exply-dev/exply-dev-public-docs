@@ -7,6 +7,7 @@ Public documentation and API specifications for exply.dev platform services.
 - **`api/`** - OpenAPI specifications for public APIs
 - **`docs/`** - General documentation and guides
   - [GitHub Projects Setup Guide](docs/github-projects-setup.md) - инструкции по настройке GitHub Projects, выбор View, использование темплейтов
+  - [Account Switching Guide](docs/account-switching.md) - как сменить GitHub аккаунт или переавторизоваться
 
 ## 🔌 Available APIs
 
