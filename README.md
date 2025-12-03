@@ -59,6 +59,21 @@ Unified HTTP API for managing exply.dev platform resources:
 
 See [`docs/`](docs/) directory for detailed guides and documentation.
 
+## 🧪 Secret Code Transcription
+
+Use the AssemblyAI helper script to transcribe the audio sample used in Orchid end-to-end tests.
+
+1. Export your AssemblyAI key:
+   ```bash
+   export ASSEMBLYAI_API_KEY=<your key>
+   ```
+2. Run the helper script:
+   ```bash
+   python3 scripts/transcribe_secret_code.py
+   ```
+   By default it reads `test-audio/secret-code-ru.ogg` and stores the extracted digits in `test-results/secret-code.txt`.
+3. Optional CLI flags allow you to override paths, polling interval, timeout, and language (see `--help` for details).
+
 ## 🔗 Related Repositories
 
 - **Project Proposals:** [exply-dev/exply-dev-public-projects](https://github.com/exply-dev/exply-dev-public-projects)
