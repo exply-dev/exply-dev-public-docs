@@ -1,5 +1,7 @@
 # Exply.dev Public Documentation
 
+[![License](https://img.shields.io/github/license/exply-dev/exply-dev-public-docs?color=0a7cff)](LICENSE) [![Version](https://img.shields.io/github/v/release/exply-dev/exply-dev-public-docs?sort=semver)](https://github.com/exply-dev/exply-dev-public-docs/releases) [![Build Status](https://img.shields.io/github/actions/workflow/status/exply-dev/exply-dev-public-docs/pages/pages-build-deployment?branch=main&label=pages%20build)](https://github.com/exply-dev/exply-dev-public-docs/actions/workflows/pages/pages-build-deployment)
+
 Public documentation and API specifications for exply.dev platform services.
 
 ## 📚 Structure
