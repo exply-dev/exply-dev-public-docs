@@ -1,0 +1,160 @@
+name: E2E Browser Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'URL to test'
+        required: true
+        default: 'https://example.com'
+      checks:
+        description: 'Comma-separated checks to run'
+        required: false
+        default: 'Page loads successfully,No error messages visible'
+      run_id:
+        description: 'Unique run identifier'
+        required: false
+
+permissions:
+  contents: write
+
+env:
+  RUN_ID: ${{ inputs.run_id || github.run_id }}
+
+jobs:
+  browser-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install vibe-tools
+        run: npm install -g vibe-tools
+      
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
+      
+      - name: Create output directory
+        run: mkdir -p "e2e-results/run-${{ env.RUN_ID }}"
+      
+      - name: Take screenshot
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          OUTPUT_DIR="e2e-results/run-${{ env.RUN_ID }}"
+          
+          echo "📸 Taking screenshot of ${{ inputs.url }}..."
+          vibe-tools browser open "${{ inputs.url }}" \
+            --screenshot="$OUTPUT_DIR/page.png" \
+            --html > "$OUTPUT_DIR/page.html" 2>&1 || true
+          
+          echo "Screenshot saved to $OUTPUT_DIR/page.png"
+      
+      - name: Run checks
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          OUTPUT_DIR="e2e-results/run-${{ env.RUN_ID }}"
+          URL="${{ inputs.url }}"
+          CHECKS="${{ inputs.checks }}"
+          
+          echo "🔍 Running E2E checks on $URL..."
+          echo "Checks: $CHECKS"
+          echo ""
+          
+          # Save metadata
+          cat > "$OUTPUT_DIR/metadata.json" << EOF
+          {
+            "run_id": "${{ env.RUN_ID }}",
+            "url": "$URL",
+            "checks": "$CHECKS",
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "workflow": "${{ github.workflow }}",
+            "commit": "${{ github.sha }}"
+          }
+          EOF
+          
+          # Run observation
+          echo "=== Page Observation ===" > "$OUTPUT_DIR/results.txt"
+          vibe-tools browser observe "What elements and actions are available on this page?" \
+            --url "$URL" >> "$OUTPUT_DIR/results.txt" 2>&1 || true
+          
+          echo "" >> "$OUTPUT_DIR/results.txt"
+          echo "=== Verification Checks ===" >> "$OUTPUT_DIR/results.txt"
+          
+          # Run each check
+          IFS=',' read -ra CHECK_ARRAY <<< "$CHECKS"
+          PASS_COUNT=0
+          FAIL_COUNT=0
+          
+          for check in "${CHECK_ARRAY[@]}"; do
+            check=$(echo "$check" | xargs)  # trim whitespace
+            echo "Checking: $check"
+            
+            result=$(vibe-tools browser extract \
+              "Verify: $check. Answer only PASS or FAIL followed by brief reason." \
+              --url "$URL" 2>&1 || echo "ERROR: Check failed")
+            
+            echo "- $check: $result" >> "$OUTPUT_DIR/results.txt"
+            
+            if echo "$result" | grep -qi "PASS"; then
+              ((PASS_COUNT++))
+              echo "  ✅ PASS"
+            else
+              ((FAIL_COUNT++))
+              echo "  ❌ FAIL: $result"
+            fi
+          done
+          
+          echo "" >> "$OUTPUT_DIR/results.txt"
+          echo "=== Summary ===" >> "$OUTPUT_DIR/results.txt"
+          echo "Passed: $PASS_COUNT" >> "$OUTPUT_DIR/results.txt"
+          echo "Failed: $FAIL_COUNT" >> "$OUTPUT_DIR/results.txt"
+          
+          # Set output
+          echo "PASS_COUNT=$PASS_COUNT" >> $GITHUB_ENV
+          echo "FAIL_COUNT=$FAIL_COUNT" >> $GITHUB_ENV
+      
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add e2e-results/
+          git commit -m "e2e: browser test run-${{ env.RUN_ID }} [automated]" || echo "No changes"
+          git push
+      
+      - name: Summary
+        run: |
+          OUTPUT_DIR="e2e-results/run-${{ env.RUN_ID }}"
+          
+          echo "## 🌐 E2E Browser Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Run ID | \`${{ env.RUN_ID }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| URL | ${{ inputs.url }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Passed | $PASS_COUNT |" >> $GITHUB_STEP_SUMMARY
+          echo "| Failed | $FAIL_COUNT |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "$OUTPUT_DIR/page.png" ]; then
+            echo "### Screenshot" >> $GITHUB_STEP_SUMMARY
+            echo "See \`$OUTPUT_DIR/page.png\`" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat "$OUTPUT_DIR/results.txt" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      
+      - name: Check for failures
+        if: env.FAIL_COUNT != '0'
+        run: |
+          echo "❌ $FAIL_COUNT checks failed!"
+          exit 1
