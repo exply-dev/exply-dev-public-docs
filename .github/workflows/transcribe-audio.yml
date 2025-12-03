@@ -8,16 +8,20 @@ on:
         required: true
         default: 'test-audio/secret-code-ru.ogg'
       language:
-        description: 'Language code'
+        description: 'Language code (ru, en, etc.)'
         required: true
         default: 'ru'
-      output_file:
-        description: 'Output file path'
-        required: true
-        default: 'test-results/secret-code.txt'
+      run_id:
+        description: 'Unique run identifier (auto-generated if empty)'
+        required: false
+        default: ''
 
 permissions:
   contents: write
+
+env:
+  # Generate unique run ID if not provided
+  RUN_ID: ${{ inputs.run_id || github.run_id }}
 
 jobs:
   transcribe:
@@ -34,6 +38,9 @@ jobs:
       - name: Install dependencies
         run: pip install assemblyai
       
+      - name: Create output directory
+        run: mkdir -p "test-results/run-${{ env.RUN_ID }}"
+      
       - name: Transcribe audio
         env:
           ASSEMBLYAI_API_KEY: ${{ secrets.ASSEMBLYAI_API_KEY }}
@@ -42,52 +49,93 @@ jobs:
           import assemblyai as aai
           import os
           import re
+          import json
+          from datetime import datetime
+          
+          run_id = os.environ.get("RUN_ID", "unknown")
+          output_dir = f"test-results/run-{run_id}"
           
           aai.settings.api_key = os.environ["ASSEMBLYAI_API_KEY"]
           
           config = aai.TranscriptionConfig(language_code="${{ inputs.language }}")
           transcriber = aai.Transcriber()
           
-          print(f"Transcribing: ${{ inputs.audio_file }}")
-          transcript = transcriber.transcribe("${{ inputs.audio_file }}", config=config)
+          audio_file = "${{ inputs.audio_file }}"
+          print(f"🎙️ Transcribing: {audio_file}")
+          print(f"📁 Output dir: {output_dir}")
+          
+          transcript = transcriber.transcribe(audio_file, config=config)
           
           if transcript.status == aai.TranscriptStatus.error:
-              print(f"Error: {transcript.error}")
+              print(f"❌ Error: {transcript.error}")
               exit(1)
           
-          print(f"Full text: {transcript.text}")
+          print(f"📝 Full text: {transcript.text}")
           
           # Extract numeric code
           numbers = re.findall(r'\d+', transcript.text)
-          if numbers:
-              code = numbers[0]
-              print(f"Secret code: {code}")
-              
-              # Write to output
-              os.makedirs(os.path.dirname("${{ inputs.output_file }}"), exist_ok=True)
-              with open("${{ inputs.output_file }}", "w") as f:
-                  f.write(code)
-          else:
-              print("No numeric code found")
-              exit(1)
+          code = numbers[0] if numbers else "NO_CODE_FOUND"
+          print(f"🔐 Secret code: {code}")
+          
+          # Save results
+          with open(f"{output_dir}/secret-code.txt", "w") as f:
+              f.write(code)
+          
+          with open(f"{output_dir}/transcript.txt", "w") as f:
+              f.write(transcript.text)
+          
+          # Save metadata
+          metadata = {
+              "run_id": run_id,
+              "audio_file": audio_file,
+              "language": "${{ inputs.language }}",
+              "timestamp": datetime.utcnow().isoformat(),
+              "secret_code": code,
+              "full_text": transcript.text
+          }
+          with open(f"{output_dir}/metadata.json", "w") as f:
+              json.dump(metadata, f, indent=2, ensure_ascii=False)
+          
+          print(f"✅ Results saved to {output_dir}/")
           EOF
       
       - name: Save terminal log
         run: |
-          mkdir -p test-results
-          echo "=== Transcription Log ===" > test-results/terminal.log
-          echo "Date: $(date)" >> test-results/terminal.log
-          echo "Audio: ${{ inputs.audio_file }}" >> test-results/terminal.log
-          echo "Language: ${{ inputs.language }}" >> test-results/terminal.log
-          echo "Output: ${{ inputs.output_file }}" >> test-results/terminal.log
-          echo "" >> test-results/terminal.log
-          echo "Result:" >> test-results/terminal.log
-          cat ${{ inputs.output_file }} >> test-results/terminal.log
+          OUTPUT_DIR="test-results/run-${{ env.RUN_ID }}"
+          {
+            echo "=== Transcription Log ==="
+            echo "Run ID: ${{ env.RUN_ID }}"
+            echo "Date: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            echo "Audio: ${{ inputs.audio_file }}"
+            echo "Language: ${{ inputs.language }}"
+            echo "Workflow: ${{ github.workflow }}"
+            echo "Commit: ${{ github.sha }}"
+            echo ""
+            echo "=== Result ==="
+            cat "$OUTPUT_DIR/secret-code.txt"
+          } > "$OUTPUT_DIR/terminal.log"
       
       - name: Commit results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add test-results/
-          git commit -m "test: transcription result [automated]" || echo "No changes"
+          git commit -m "test: transcription run-${{ env.RUN_ID }} [automated]"
           git push
+      
+      - name: Summary
+        run: |
+          OUTPUT_DIR="test-results/run-${{ env.RUN_ID }}"
+          echo "## 🎉 Transcription Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Run ID | \`${{ env.RUN_ID }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Audio | \`${{ inputs.audio_file }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Language | \`${{ inputs.language }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Secret Code | \`$(cat $OUTPUT_DIR/secret-code.txt)\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Files" >> $GITHUB_STEP_SUMMARY
+          echo "- [\`$OUTPUT_DIR/secret-code.txt\`](../blob/main/$OUTPUT_DIR/secret-code.txt)" >> $GITHUB_STEP_SUMMARY
+          echo "- [\`$OUTPUT_DIR/transcript.txt\`](../blob/main/$OUTPUT_DIR/transcript.txt)" >> $GITHUB_STEP_SUMMARY
+          echo "- [\`$OUTPUT_DIR/metadata.json\`](../blob/main/$OUTPUT_DIR/metadata.json)" >> $GITHUB_STEP_SUMMARY
