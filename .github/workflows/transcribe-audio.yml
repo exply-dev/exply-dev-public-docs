@@ -16,6 +16,9 @@ on:
         required: true
         default: 'test-results/secret-code.txt'
 
+permissions:
+  contents: write
+
 jobs:
   transcribe:
     runs-on: ubuntu-latest
@@ -72,10 +75,13 @@ jobs:
       - name: Save terminal log
         run: |
           mkdir -p test-results
-          echo "Transcription completed at $(date)" > test-results/terminal.log
+          echo "=== Transcription Log ===" > test-results/terminal.log
+          echo "Date: $(date)" >> test-results/terminal.log
           echo "Audio: ${{ inputs.audio_file }}" >> test-results/terminal.log
           echo "Language: ${{ inputs.language }}" >> test-results/terminal.log
           echo "Output: ${{ inputs.output_file }}" >> test-results/terminal.log
+          echo "" >> test-results/terminal.log
+          echo "Result:" >> test-results/terminal.log
           cat ${{ inputs.output_file }} >> test-results/terminal.log
       
       - name: Commit results
