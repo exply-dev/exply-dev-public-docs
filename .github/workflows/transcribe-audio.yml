@@ -1,0 +1,87 @@
+name: Transcribe Audio
+
+on:
+  workflow_dispatch:
+    inputs:
+      audio_file:
+        description: 'Path to audio file in repo'
+        required: true
+        default: 'test-audio/secret-code-ru.ogg'
+      language:
+        description: 'Language code'
+        required: true
+        default: 'ru'
+      output_file:
+        description: 'Output file path'
+        required: true
+        default: 'test-results/secret-code.txt'
+
+jobs:
+  transcribe:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: pip install assemblyai
+      
+      - name: Transcribe audio
+        env:
+          ASSEMBLYAI_API_KEY: ${{ secrets.ASSEMBLYAI_API_KEY }}
+        run: |
+          python << 'EOF'
+          import assemblyai as aai
+          import os
+          import re
+          
+          aai.settings.api_key = os.environ["ASSEMBLYAI_API_KEY"]
+          
+          config = aai.TranscriptionConfig(language_code="${{ inputs.language }}")
+          transcriber = aai.Transcriber()
+          
+          print(f"Transcribing: ${{ inputs.audio_file }}")
+          transcript = transcriber.transcribe("${{ inputs.audio_file }}", config=config)
+          
+          if transcript.status == aai.TranscriptStatus.error:
+              print(f"Error: {transcript.error}")
+              exit(1)
+          
+          print(f"Full text: {transcript.text}")
+          
+          # Extract numeric code
+          numbers = re.findall(r'\d+', transcript.text)
+          if numbers:
+              code = numbers[0]
+              print(f"Secret code: {code}")
+              
+              # Write to output
+              os.makedirs(os.path.dirname("${{ inputs.output_file }}"), exist_ok=True)
+              with open("${{ inputs.output_file }}", "w") as f:
+                  f.write(code)
+          else:
+              print("No numeric code found")
+              exit(1)
+          EOF
+      
+      - name: Save terminal log
+        run: |
+          mkdir -p test-results
+          echo "Transcription completed at $(date)" > test-results/terminal.log
+          echo "Audio: ${{ inputs.audio_file }}" >> test-results/terminal.log
+          echo "Language: ${{ inputs.language }}" >> test-results/terminal.log
+          echo "Output: ${{ inputs.output_file }}" >> test-results/terminal.log
+          cat ${{ inputs.output_file }} >> test-results/terminal.log
+      
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add test-results/
+          git commit -m "test: transcription result [automated]" || echo "No changes"
+          git push
