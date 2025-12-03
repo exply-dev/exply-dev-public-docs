@@ -1,0 +1,1 @@
+Run `python scripts/assemblyai_transcribe.py` to overwrite this file with the latest transcript from AssemblyAI.
